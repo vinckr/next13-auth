@@ -1,48 +1,54 @@
-import Head from "next/head"
-import Image from "next/image"
-import { Inter } from "next/font/google"
-import styles from "@/styles/Home.module.css"
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "next/font/google";
+import styles from "@/styles/Home.module.css";
 // highlight-start
-import { useEffect, useState } from "react"
-import { useRouter } from "next/router"
-import { Configuration, FrontendApi, Session, Identity } from "@ory/client"
-import { edgeConfig } from "@ory/integrations/next"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { Configuration, FrontendApi, Session, Identity } from "@ory/client";
 
-const ory = new FrontendApi(new Configuration(edgeConfig))
+const ory = new FrontendApi(
+  new Configuration({
+    basePath: process.env.NEXT_PUBLIC_ORY_SDK_URL,
+    baseOptions: {
+      withCredentials: true,
+    },
+  })
+);
 
 // Returns either the email or the username depending on the user's Identity Schema
 const getUserName = (identity: Identity) =>
-  identity.traits.email || identity.traits.username
+  identity.traits.email || identity.traits.username;
 // highlight-end
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   // highlight-start
-  const router = useRouter()
-  const [session, setSession] = useState<Session | undefined>()
-  const [logoutUrl, setLogoutUrl] = useState<string | undefined>()
+  const router = useRouter();
+  const [session, setSession] = useState<Session | undefined>();
+  const [logoutUrl, setLogoutUrl] = useState<string | undefined>();
 
   useEffect(() => {
     ory
       .toSession()
       .then(({ data }) => {
         // User has a session!
-        setSession(data)
+        setSession(data);
         // Create a logout url
         ory.createBrowserLogoutFlow().then(({ data }) => {
-          setLogoutUrl(data.logout_url)
-        })
+          setLogoutUrl(data.logout_url);
+        });
       })
       .catch(() => {
         // Redirect to login page
-        return router.push(edgeConfig.basePath + "/ui/login")
-      })
-  }, [router])
+        return router.push(edgeConfig.basePath + "/ui/login");
+      });
+  }, [router]);
 
   if (!session) {
     // Still loading
-    return null
+    return null;
   }
   // highlight-end
 
@@ -163,5 +169,5 @@ export default function Home() {
         </div>
       </main>
     </>
-  )
+  );
 }
