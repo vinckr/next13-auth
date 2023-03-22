@@ -7,9 +7,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Configuration, FrontendApi, Session, Identity } from "@ory/client";
 
+const basePath = process.env.NEXT_PUBLIC_ORY_SDK_URL;
+
 const ory = new FrontendApi(
   new Configuration({
-    basePath: process.env.NEXT_PUBLIC_ORY_SDK_URL,
+    basePath: basePath,
     baseOptions: {
       withCredentials: true,
     },
@@ -42,7 +44,7 @@ export default function Home() {
       })
       .catch(() => {
         // Redirect to login page
-        return router.push(edgeConfig.basePath + "/ui/login");
+        return router.push(basePath + "/ui/login");
       });
   }, [router]);
 
